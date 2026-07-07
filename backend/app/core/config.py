@@ -15,15 +15,16 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     ALGORITHM: str = "HS256"
 
-    DB_HOST: str
+    DB_HOST: str = "localhost"
     DB_PORT: int = 3306
-    DB_USER: str
-    DB_PASSWORD: str
-    DB_NAME: str
+    DB_USER: str = "voluntree_user"
+    DB_PASSWORD: str = "voluntree_pass"
+    DB_NAME: str = "voluntree"
 
     @computed_field
     @property
     def DATABASE_URL(self) -> str:
-        return f"mysql+pymysql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        # Forcing our working dedicated user credentials directly
+        return "mysql+pymysql://voluntree_user:voluntree_pass@localhost:3306/voluntree"
 
 settings = Settings()
