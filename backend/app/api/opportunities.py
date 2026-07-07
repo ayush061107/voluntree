@@ -4,22 +4,19 @@ from typing import List
 from app.core.database import get_db
 from app.models import models
 from app.schemas import opportunity as schemas
+from app.api.deps import get_current_ngo
 
 router = APIRouter()
 
 @router.post("/", response_model=schemas.OpportunityResponse, status_code=status.HTTP_201_CREATED)
 def create_opportunity(
     opp_in: schemas.OpportunityCreate, 
-    ngo_id: int, # Temporary parameter until we attach your get_current_user dependency
+    current_ngo: models.NGO = Depends(get_current_ngo), # Enforce token check
     db: Session = Depends(get_db)
 ):
-    """Allows a registered NGO to post a new volunteering opportunity."""
-    ngo = db.query(models.NGO).filter(models.NGO.id == ngo_id).first()
-    if not ngo:
-        raise HTTPException(status_code=404, detail="NGO account not found")
-
+    """Allows an authenticated NGO to post a new volunteering opportunity."""
     new_opp = models.Opportunity(
-        ngo_id=ngo_id,
+        ngo_id=current_ngo.id, # Automatically extract id from securely verified token
         title=opp_in.title,
         description=opp_in.description,
         required_skills=opp_in.required_skills,
