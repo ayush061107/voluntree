@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import engine, Base
 from app.models import models
-from app.api import auth, volunteer, opportunities, applications, matching 
+from app.api import auth, volunteer, certificates, opportunities, applications, matching 
 
 # Automatically creates all MySQL tables on application startup
 Base.metadata.create_all(bind=engine)
@@ -27,6 +27,7 @@ app.include_router(volunteer.router, prefix=f"{settings.API_V1_STR}/volunteers",
 app.include_router(opportunities.router, prefix=f"{settings.API_V1_STR}/opportunities", tags=["Opportunities"])
 app.include_router(applications.router, prefix=f"{settings.API_V1_STR}/applications", tags=["Applications"])
 app.include_router(matching.router, prefix=settings.API_V1_STR, tags=["AI Matching"])
+app.include_router(certificates.router, prefix=f"{settings.API_V1_STR}/certificates", tags=["Impact Tracking"])
 
 @app.get("/")
 def read_root():
