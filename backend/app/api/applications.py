@@ -15,12 +15,16 @@ def apply_to_opportunity(
     db: Session = Depends(get_db)
 ):
     """Allows an authenticated volunteer to apply for an active community opportunity."""
+    # Ensure current user is actually a volunteer
+    if getattr(current_user, "role", None) == "ngo":
+        raise HTTPException(status_code=403, detail="NGOs cannot apply for volunteer opportunities")
+
     opp = db.query(models.Opportunity).filter(models.Opportunity.id == app_in.opportunity_id).first()
     if not opp:
         raise HTTPException(status_code=404, detail="Opportunity not found")
         
     existing = db.query(models.Application).filter(
-        models.Application.volunteer_id == current_user.id, # Extracted from safe token session
+        models.Application.volunteer_id == current_user.id,
         models.Application.opportunity_id == app_in.opportunity_id
     ).first()
     if existing:
@@ -35,8 +39,51 @@ def apply_to_opportunity(
     db.commit()
     db.refresh(new_app)
     return new_app
-    
+
 @router.get("/volunteer/{volunteer_id}", response_model=List[schemas.ApplicationResponse])
 def get_volunteer_applications(volunteer_id: int, db: Session = Depends(get_db)):
     """Retrieves all historical applications submitted by a specific volunteer account."""
     return db.query(models.Application).filter(models.Application.volunteer_id == volunteer_id).all()
+
+@router.get("/ngo/my-applications", response_model=List[schemas.ApplicationResponse])
+def get_ngo_applications(
+    current_user: models.NGO = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Retrieves all incoming applications for opportunities managed by the logged-in NGO."""
+    # Ensure current user is an NGO
+    if not hasattr(current_user, "org_name"):
+        raise HTTPException(status_code=403, detail="Only NGOs can access this dashboard")
+
+    return db.query(models.Application).join(models.Opportunity).filter(
+        models.Opportunity.ngo_id == current_user.id
+    ).all()
+
+@router.patch("/{application_id}/status", response_model=schemas.ApplicationResponse)
+def update_application_status(
+    application_id: int,
+    status_update: schemas.ApplicationUpdateStatus,
+    current_user: models.NGO = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Allows an NGO to Accept or Reject a specific volunteer application."""
+    if not hasattr(current_user, "org_name"):
+        raise HTTPException(status_code=403, detail="Only NGOs can modify application statuses")
+
+    application = db.query(models.Application).filter(models.Application.id == application_id).first()
+    if not application:
+        raise HTTPException(status_code=404, detail="Application record not found")
+
+    # Guard: Ensure this NGO actually owns the target opportunity
+    if application.opportunity.ngo_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You do not have permission to modify this application")
+
+    # Validate status values to match DB Enum expectations ('Pending', 'Accepted', 'Rejected', 'Completed')
+    normalized_status = status_update.status.capitalize()
+    if normalized_status not in ['Pending', 'Accepted', 'Rejected', 'Completed']:
+        raise HTTPException(status_code=400, detail="Invalid status value. Use 'Accepted' or 'Rejected'")
+
+    application.status = normalized_status
+    db.commit()
+    db.refresh(application)
+    return application
