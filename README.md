@@ -150,30 +150,35 @@ All payloads accept and output strict application JSON content shapes enforced b
 
 Follow these sequential steps exactly to configure and boot up your local instance of VolunTree without environment friction.
 
-📡 1. Configure and Run the Backend Environment
-Open your system shell, enter the backend working space, establish an isolated virtual context, and install the verified application library bundle:
+### 🛠️ Backend Setup
 
-cd backend
-python3 -m venv venv
-source venv/bin/activate
+Always navigate directly to the `backend` workspace folder before installing dependencies or starting the server.
+
+```bash
+# 1. Navigate to the backend folder
+cd /workspaces/voluntree/backend
+
+# 2. Install the clean Python requirements manifest
 pip install -r requirements.txt
 
-Run the Testing Data Seeder:
-Before launching the live development server, initialize and seed your active SQLite runtime tables with pre-built dummy credentials, testing relationships, and demo records:
-python3 seed_demo.py
+# 3. Initialize and seed the local database state cleanly
+rm -f voluntree.db
+PYTHONPATH=. python3 seed_demo.py
 
-Activate the Live FastAPI Daemon:
-Fire up the local Uvicorn process engine bound securely to terminal port 8000:
-uvicorn app.main:app --reload --port 8000
-The interactive backend API reference panel will build automatically and run live at http://127.0.0.1:8000/docs
+# 4. Launch the application API server framework
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 💻 2. Configure and Boot the Frontend User Client
 Open an independent sibling shell instance or a new terminal window to spin up your client-side React UI layout stack:
 
-cd frontend
+# 1. Navigate to the frontend folder
+cd /workspaces/voluntree/frontend
+
+# 2. Download Vite and all project UI modules
 npm install
-npm run dev
-Your application framework window will spin up instantly. Open your browser and point it straight to http://localhost:5173 to test the environment live.
+
+# 3. Spin up the local development interface server
+npm run dev -- --host 0.0.0.0 --port 5173
 
 🧪 Interactive Testing and Evaluation Walkthrough
 
