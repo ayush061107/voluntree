@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check if a session already exists on boot
+  // Read session token and pull explicit profile record on boot
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('voluntree_token');
@@ -16,11 +16,11 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        // Fetch current user details from our dependency token route
         const response = await apiClient.get('/auth/me');
+        // Extract user data from response payload
         setUser(response.data);
       } catch (error) {
-        console.error("Session restoration failed:", error);
+        console.error("Session profile sync failed:", error);
         logout();
       } finally {
         setLoading(false);
@@ -29,22 +29,18 @@ export const AuthProvider = ({ children }) => {
     fetchProfile();
   }, []);
 
-  const login = async (username, password) => {
+  const login = async (email, password) => {
     setLoading(true);
     try {
-      // URL encoded payload matching OAuth2 standards used in FastAPI backend
-      const formData = new URLSearchParams();
-      formData.append('username', username);
-      formData.append('password', password);
-
-      const response = await apiClient.post('/auth/token', formData, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      const response = await apiClient.post('/auth/login', {
+        email: email,
+        password: password
       });
 
       const { access_token } = response.data;
       localStorage.setItem('voluntree_token', access_token);
 
-      // Fetch profile details immediately following successful authentication
+      // Fetch user details immediately to load correct role configuration
       const userProfile = await apiClient.get('/auth/me');
       setUser(userProfile.data);
       return userProfile.data;

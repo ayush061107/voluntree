@@ -1,14 +1,13 @@
 import axios from 'axios';
 
-// Create a configured axios instance targeting our FastAPI port
+// Dynamically uses an environment variable fallback for production/deployment ease
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://solid-space-funicular-4jvr5rw697x42jj57-8000.app.github.dev/api/v1',
   headers: {
-    'Content-Type': 'application/json',
-  },
+    'Content-Type': 'application/json'
+  }
 });
 
-// Request interceptor: Automatically inject the auth token if it exists
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('voluntree_token');
@@ -17,9 +16,7 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 export default apiClient;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import AuthScreen from './components/AuthScreen';
 import VolunteerExplorer from './components/VolunteerExplorer';
@@ -7,9 +7,18 @@ import { LogOut, Layout, Award, FileText, Sparkles, Building, Settings, MapPin }
 
 export default function App() {
   const { user, loading, logout } = useAuth();
-  const [currentTab, setCurrentTab] = useState('overview'); // overview | explorer | certificates | ngo_panel
+  const [currentTab, setCurrentTab] = useState('overview');
 
-  // Show a clean loading state while restoring tokens from localStorage
+  // Explicitly align role classification flag with our backend payload properties
+  const isNGO = user?.role === 'ngo';
+
+  // Automatically update the starting layout tab context to match the active user profile
+  useEffect(() => {
+    if (user) {
+      setCurrentTab('overview');
+    }
+  }, [user]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -21,13 +30,9 @@ export default function App() {
     );
   }
 
-  // If no user session is validated, drop them onto the auth grid
   if (!user) {
     return <AuthScreen />;
   }
-
-  // Detect role profiles matching our FastAPI model structures
-  const isNGO = Object.prototype.hasOwnProperty.call(user, 'org_name');
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -45,7 +50,7 @@ export default function App() {
 
         <div className="flex items-center space-x-4">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold text-slate-800">{isNGO ? user.org_name : user.name}</p>
+            <p className="text-sm font-semibold text-slate-800">{isNGO ? (user.org_name || 'NGO Member') : (user.name || 'Volunteer')}</p>
             <p className="text-xs text-slate-500">{user.email}</p>
           </div>
           <button 
@@ -114,7 +119,7 @@ export default function App() {
             <>
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                 <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-                  Hello, {isNGO ? user.org_name : user.name}! 👋
+                  Hello, {isNGO ? (user.org_name || 'Organization Leader') : (user.name || 'Volunteer')}! 👋
                 </h2>
                 <p className="text-slate-600 text-sm leading-relaxed">
                   {isNGO 

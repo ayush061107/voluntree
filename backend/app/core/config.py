@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     @computed_field
     @property
     def DATABASE_URL(self) -> str:
-        # Forcing our working dedicated user credentials directly
-        return "mysql+pymysql://voluntree_user:voluntree_pass@localhost:3306/voluntree"
+        # Use our local SQLite database file directly
+        return "sqlite:////workspaces/voluntree/backend/voluntree.db"
 
 settings = Settings()

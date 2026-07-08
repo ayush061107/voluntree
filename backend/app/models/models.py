@@ -7,12 +7,12 @@ class NGO(Base):
     __tablename__ = "ngos"
 
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String(255), unique=True, nullable=False, index=True)
-    hashed_password = Column(String(255), nullable=False)
-    org_name = Column(String(255), nullable=False)
+    email = Column(Text, unique=True, nullable=False, index=True)
+    hashed_password = Column(Text, nullable=False)
+    org_name = Column(Text, nullable=False)
     description = Column(Text, nullable=True)
-    location = Column(String(255), nullable=False)
-    website = Column(String(255), nullable=True)
+    location = Column(Text, nullable=False)
+    website = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     # If an NGO is deleted, its posted opportunities are automatically deleted
@@ -23,13 +23,13 @@ class Volunteer(Base):
     __tablename__ = "volunteers"
 
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String(255), unique=True, nullable=False, index=True)
-    hashed_password = Column(String(255), nullable=False)
-    full_name = Column(String(255), nullable=False)
+    email = Column(Text, unique=True, nullable=False, index=True)
+    hashed_password = Column(Text, nullable=False)
+    full_name = Column(Text, nullable=False)
     skills = Column(Text, nullable=True)          # Comma-separated tags for matching
     interests = Column(Text, nullable=True)       # Comma-separated tags for matching
-    location = Column(String(255), nullable=False)
-    availability = Column(String(255), nullable=True)
+    location = Column(Text, nullable=False)
+    availability = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     applications = relationship("Application", back_populates="volunteer", cascade="all, delete-orphan")
@@ -40,12 +40,12 @@ class Opportunity(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     ngo_id = Column(Integer, ForeignKey("ngos.id", ondelete="CASCADE"), nullable=False)
-    title = Column(String(255), nullable=False)
+    title = Column(Text, nullable=False)
     description = Column(Text, nullable=False)
     required_skills = Column(Text, nullable=False)
     interests_category = Column(Text, nullable=False)
-    location = Column(String(255), nullable=False)
-    availability_needed = Column(String(255), nullable=True)
+    location = Column(Text, nullable=False)
+    availability_needed = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     ngo = relationship("NGO", back_populates="opportunities")
