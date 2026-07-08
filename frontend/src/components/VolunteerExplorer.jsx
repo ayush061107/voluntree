@@ -18,7 +18,7 @@ export default function VolunteerExplorer() {
     try {
       const [oppsRes, recsRes] = await Promise.all([
         apiClient.get('/opportunities/'),
-        apiClient.get('/ai/match').catch(() => ({ data: [] })) // Fallback if no profile exists yet
+        apiClient.get('/matching/recommendations').catch(() => ({ data: [] })) // Matches exact FastAPI matching router paths
       ]);
       setOpportunities(oppsRes.data);
       setRecommendations(recsRes.data);
@@ -77,7 +77,7 @@ export default function VolunteerExplorer() {
                 <div>
                   <span className="absolute top-4 right-4 bg-amber-100 text-amber-900 text-xs font-bold px-2.5 py-1 rounded-full flex items-center space-x-1">
                     <Sparkles className="h-3 w-3 fill-amber-600 text-amber-600" />
-                    <span>High Match</span>
+                    <span>{opp.match_score || 'High Match'}</span>
                   </span>
                   <h4 className="font-bold text-slate-900 pr-20">{opp.title}</h4>
                   <p className="text-slate-600 text-sm mt-2 line-clamp-2">{opp.description}</p>
@@ -85,7 +85,7 @@ export default function VolunteerExplorer() {
                 <div className="mt-4 pt-4 border-t border-amber-100 flex items-center justify-between">
                   <div className="flex items-center space-x-2 text-xs text-slate-500">
                     <MapPin className="h-3.5 w-3.5" />
-                    <span>Remote/On-site</span>
+                    <span>{opp.location || 'Remote/On-site'}</span>
                   </div>
                   <button 
                     onClick={() => handleApply(opp.id)}
@@ -118,7 +118,7 @@ export default function VolunteerExplorer() {
                   <div className="flex items-center space-x-4 text-xs text-slate-500">
                     <div className="flex items-center space-x-1">
                       <Briefcase className="h-3.5 w-3.5" />
-                      <span>{opp.category?.name || 'General'}</span>
+                      <span>{opp.interests_category || 'General'}</span>
                     </div>
                   </div>
                   <button 

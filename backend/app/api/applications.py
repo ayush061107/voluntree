@@ -11,11 +11,10 @@ router = APIRouter()
 @router.post("/", response_model=schemas.ApplicationResponse, status_code=status.HTTP_201_CREATED)
 def apply_to_opportunity(
     app_in: schemas.ApplicationCreate,
-    current_user: models.Volunteer = Depends(get_current_user), # Enforce token check
+    current_user: models.Volunteer = Depends(get_current_user), 
     db: Session = Depends(get_db)
 ):
     """Allows an authenticated volunteer to apply for an active community opportunity."""
-    # Ensure current user is actually a volunteer
     if getattr(current_user, "role", None) == "ngo":
         raise HTTPException(status_code=403, detail="NGOs cannot apply for volunteer opportunities")
 
@@ -51,7 +50,6 @@ def get_ngo_applications(
     db: Session = Depends(get_db)
 ):
     """Retrieves all incoming applications for opportunities managed by the logged-in NGO."""
-    # Ensure current user is an NGO
     if not hasattr(current_user, "org_name"):
         raise HTTPException(status_code=403, detail="Only NGOs can access this dashboard")
 
@@ -70,15 +68,20 @@ def update_application_status(
     if not hasattr(current_user, "org_name"):
         raise HTTPException(status_code=403, detail="Only NGOs can modify application statuses")
 
-    application = db.query(models.Application).filter(models.Application.id == application_id).first()
-    if not application:
+    # Fetch application along with checking ownership via an explicit join condition
+    application_data = db.query(models.Application, models.Opportunity.ngo_id)\
+        .join(models.Opportunity, models.Application.opportunity_id == models.Opportunity.id)\
+        .filter(models.Application.id == application_id).first()
+
+    if not application_data:
         raise HTTPException(status_code=404, detail="Application record not found")
 
-    # Guard: Ensure this NGO actually owns the target opportunity
-    if application.opportunity.ngo_id != current_user.id:
+    application, ngo_id = application_data
+
+    # Safe Guard check using the joined table record
+    if ngo_id != current_user.id:
         raise HTTPException(status_code=403, detail="You do not have permission to modify this application")
 
-    # Validate status values to match DB Enum expectations ('Pending', 'Accepted', 'Rejected', 'Completed')
     normalized_status = status_update.status.capitalize()
     if normalized_status not in ['Pending', 'Accepted', 'Rejected', 'Completed']:
         raise HTTPException(status_code=400, detail="Invalid status value. Use 'Accepted' or 'Rejected'")
