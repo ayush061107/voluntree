@@ -179,6 +179,16 @@ npm install
 
 # 3. Spin up the local development interface server
 npm run dev -- --host 0.0.0.0 --port 5173
+🌐 Network Access Notice (Crucial for Cloud Environments)
+⚠️ IMPORTANT FOR CODESPACES: Once both servers are actively running, you must expose the application network tunnels to access the interface properly:
+
+Switch to the Ports panel tab in your bottom interface drawer.
+
+Ensure ports 5173 (Frontend) and 8000 (Backend) are visible in the registry list.
+
+Right-click both port rows, hover over Port Visibility, and change their state from Private to Public.
+
+Click the globe icon next to port 5173 to open the fully functional web interface window! 
 
 🧪 Interactive Testing and Evaluation Walkthrough
 
