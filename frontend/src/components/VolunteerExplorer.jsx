@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../api/client';
-import { Sparkles, Calendar, MapPin, Briefcase, CheckCircle, AlertCircle } from 'lucide-react';
+import { Sparkles, MapPin, Briefcase, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function VolunteerExplorer() {
   const [opportunities, setOpportunities] = useState([]);
@@ -18,7 +18,7 @@ export default function VolunteerExplorer() {
     try {
       const [oppsRes, recsRes] = await Promise.all([
         apiClient.get('/opportunities/'),
-        apiClient.get('/matching/recommendations').catch(() => ({ data: [] })) // Matches exact FastAPI matching router paths
+        apiClient.get('/matching/recommendations').catch(() => ({ data: [] }))
       ]);
       setOpportunities(oppsRes.data);
       setRecommendations(recsRes.data);
@@ -33,7 +33,7 @@ export default function VolunteerExplorer() {
     setApplyingId(oppId);
     setMessage({ type: '', text: '' });
     try {
-      await apiClient.post('/applications/', { opportunity_id: oppId });
+      await apiClient.post('/applications/', { opportunity_id: oppId});
       setMessage({ type: 'success', text: 'Application submitted successfully!' });
     } catch (err) {
       setMessage({ 

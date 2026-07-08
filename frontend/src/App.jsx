@@ -1,23 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
+import apiClient from './api/client';
 import AuthScreen from './components/AuthScreen';
 import VolunteerExplorer from './components/VolunteerExplorer';
+import VolunteerCertificates from './components/VolunteerCertificates';
 import NgoManager from './components/NgoManager';
-import { LogOut, Layout, Award, FileText, Sparkles, Building, Settings, MapPin } from 'lucide-react';
+import { LogOut, Layout, Award, Sparkles, Building, MapPin } from 'lucide-react';
 
 export default function App() {
   const { user, loading, logout } = useAuth();
   const [currentTab, setCurrentTab] = useState('overview');
+  const [certificates, setCertificates] = useState([]);
+  const [loadingCerts, setLoadingCerts] = useState(false);
 
-  // Explicitly align role classification flag with our backend payload properties
   const isNGO = user?.role === 'ngo';
 
-  // Automatically update the starting layout tab context to match the active user profile
   useEffect(() => {
-    if (user) {
+    if (user && !isNGO) {
+      fetchGlobalMetrics();
+    } else {
       setCurrentTab('overview');
     }
   }, [user]);
+
+  const fetchGlobalMetrics = async () => {
+    setLoadingCerts(true);
+    try {
+      const res = await apiClient.get('/certificates/').catch(() => ({ data: [] }));
+      setCertificates(res.data);
+    } catch (err) {
+      console.error("Error aggregating global analytics:", err);
+    } finally {
+      setLoadingCerts(false);
+    }
+  };
+
+  const totalHours = certificates.reduce((acc, curr) => acc + (curr.hours_logged || 0), 0);
 
   if (loading) {
     return (
@@ -36,7 +54,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      {/* Top Navigation Bar */}
       <nav className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
         <div className="flex items-center space-x-2">
           <div className="bg-emerald-600 text-white p-2 rounded-lg">
@@ -63,9 +80,7 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Main Core View Area */}
       <main className="flex-1 p-6 max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Left Sidebar Menu */}
         <div className="md:col-span-1 space-y-2">
           <button 
             onClick={() => setCurrentTab('overview')}
@@ -113,7 +128,6 @@ export default function App() {
           )}
         </div>
 
-        {/* Right Dashboard Content Shell */}
         <div className="md:col-span-3 space-y-6">
           {currentTab === 'overview' && (
             <>
@@ -136,7 +150,6 @@ export default function App() {
                 )}
               </div>
 
-              {/* Feature placeholder cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-2">
                   <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Active Assignments</h3>
@@ -146,19 +159,18 @@ export default function App() {
                   <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">
                     {isNGO ? 'Total Dispatched Hours' : 'Verified Hours Logged'}
                   </h3>
-                  <p className="text-2xl font-extrabold text-emerald-600">0 hrs</p>
+                  <p className="text-2xl font-extrabold text-emerald-600">
+                    {isNGO ? '0 hrs' : `${totalHours} hrs`}
+                  </p>
                 </div>
               </div>
             </>
           )}
 
-          {currentTab === 'explorer' && !isNGO && <VolunteerExplorer />}
+          {currentTab === 'explorer' && !isNGO && <VolunteerExplorer/>}
 
           {currentTab === 'certificates' && !isNGO && (
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">My Impact Certificates</h3>
-              <p className="text-sm text-slate-500 italic">No validated service certificates found on profile yet.</p>
-            </div>
+            <VolunteerCertificates initialCertificates={certificates} isLoadingInitial={loadingCerts} />
           )}
 
           {currentTab === 'ngo_panel' && isNGO && <NgoManager />}
