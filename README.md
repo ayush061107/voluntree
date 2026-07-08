@@ -54,50 +54,58 @@ The system leverages a FastAPI backend to run semantic skill-matching algorithms
 
 ---
 
-## 📂 System File Tree Layout
+## 📂 System File Tree Layout (Verified Real-Time Structure)
 
 ```text
 voluntree/
 ├── backend/
 │   ├── app/
 │   │   ├── api/
-│   │   │   ├── auth.py         # Sign-up, token exchange, and active session verification
-│   │   │   ├── certificates.py # Hour-logging engines and validation credential generation
-│   │   │   ├── deps.py         # Global dependency injection and role-based validation hooks
-│   │   │   └── opportunities.py# Opportunity creation and algorithmic matching logic
+│   │   │   ├── applications.py # Handles individual program application tracking lifecycle
+│   │   │   ├── auth.py         # Sign-up, login token exchange, and validation routines
+│   │   │   ├── certificates.py # Hours verification engines and validation credentials
+│   │   │   ├── deps.py         # Shared dependency injections and authorization tokens
+│   │   │   ├── matching.py     # Core algorithmic tag matching engine calculations
+│   │   │   ├── opportunities.py# Opportunity publishing logic handles and structures
+│   │   │   └── volunteer.py    # Dedicated volunteer profiles and tracking dashboards
 │   │   ├── core/
-│   │   │   ├── config.py       # Global system definitions and security keys configuration
-│   │   │   └── database.py     # SQLite engine management and SessionLocal creators
+│   │   │   ├── config.py       # Security key constants and environment variables
+│   │   │   ├── database.py     # SQLite engine engine connection sessions and initialization
+│   │   │   └── security.py     # Password cryptography modules (Bcrypt hashes generator)
 │   │   ├── models/
-│   │   │   └── models.py       # Base schemas for Users, Certificates, and Application states
-│   │   ├── schemas/            # Declarative structural constraints for API endpoints
-│   │   └── main.py             # Root initialization mapping CORS middleware blocks
-│   ├── requirements.txt        # Frozen Python backend environment list
-│   ├── seed_demo.py            # Automated environment generation testing script
-│   └── voluntree.db            # Running database engine ledger
+│   │   │   ├── application.py  # Application data class mapping configurations
+│   │   │   └── models.py       # Shared database base entity schemas mapping models
+│   │   ├── schemas/            # Pydantic schema engines validation blocks
+│   │   │   ├── application.py  
+│   │   │   ├── auth.py
+│   │   │   ├── certificate.py
+│   │   │   ├── opportunity.py
+│   │   │   └── volunteer.py
+│   │   └── main.py             # App boot management setup mapping global CORS rules
+│   ├── requirements.txt        # Frozen Python backend requirement dependencies
+│   ├── seed_demo.py            # Automated testing database simulation seeder script
+│   └── voluntree.db            # Master operational engine relational ledger
 └── frontend/
     ├── src/
     │   ├── api/
-    │   │   └── client.js       # Central API wrapper pre-injecting active JWT credentials
+    │   │   └── client.js       # Core Axios client instance pre-injecting security tokens
+    │   ├── assets/             # Bundled system UI visual graphics
     │   ├── components/
-    │   │   ├── AuthScreen.jsx  # Toggle state login and registration panel interface
-    │   │   ├── NgoManager.jsx  # Application pipeline manager and verification form
-    │   │   ├── VolunteerCertificates.jsx # Impact statistics panel and modal badge canvas
-    │   │   └── VolunteerExplorer.jsx     # AI listing discovery feed view
+    │   │   ├── AuthScreen.jsx  # Toggle dashboard log-in panel controls
+    │   │   ├── NgoManager.jsx  # Active application lifecycle status pipelines console
+    │   │   ├── VolunteerCertificates.jsx # Micro-credential card modal badge layout
+    │   │   └── VolunteerExplorer.jsx     # AI listing discovery feed panel view
     │   ├── context/
-    │   │   └── AuthContext.jsx # Global security provider managing active profile sessions
-    │   ├── App.jsx             # Top-level application layout controller
-    │   └── main.jsx            # DOM registration mount node
-    ├── package.json            # Node framework module configuration file
-    └── vite.config.js          # Client builder specifications mapping local proxy loops
-
-
+    │   │   └── AuthContext.jsx # Global profile user session provider setup
+    │   ├── App.css             # Main stylesheet customization classes
+    │   ├── App.jsx             # Top-level routing layout core supervisor component
+    │   ├── index.css           # Global app layout template overrides
+    │   └── main.jsx            # Core react element mounting node mapping setup
+    └── package.json            # Dev tools (Vite, Tailwind V4) deployment parameters
 ⚡ Step-By-Step Installation & Run Manual
-
 Follow these sequential steps exactly to configure and boot up your local instance of VolunTree without environment friction.
 
 📡 1. Configure and Run the Backend Environment
-
 Open your system shell, enter the backend working space, establish an isolated virtual context, and install the verified application library bundle:
 
 Bash
@@ -151,7 +159,6 @@ Log the Service Metrics: On that same accepted line item, click the blue Log Hou
 Inspect the Minted Micro-Credential Badge: Log back in as Volunteer B. Go to the newly available My Certificates console panel. Click the action button on your new row card. A beautiful modal certificate canvas renders live, displaying the verified 12 hours metric along with a secure, system-generated cryptographic hash receipt.
 
 🛠️ Common Troubleshooting Run-book
-
 Problem: App crashes on password login.
 
 Resolution: Ensure passlib has bcrypt dependencies explicitly initialized. Run pip install passlib bcrypt and make sure your server environment is reloaded.
