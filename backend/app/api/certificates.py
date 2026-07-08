@@ -4,14 +4,14 @@ from typing import List
 from app.core.database import get_db
 from app.models import models
 from app.schemas import certificate as schemas
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, get_current_ngo
 
 router = APIRouter()
 
 @router.post("/log-hours", response_model=schemas.CertificateResponse, status_code=status.HTTP_201_CREATED)
 def log_volunteer_hours(
     cert_in: schemas.CertificateCreate,
-    current_user: models.NGO = Depends(get_current_user),
+    current_user: models.NGO = Depends(get_current_ngo),
     db: Session = Depends(get_db)
 ):
     """Allows an NGO to verify hours and issue an impact certificate for a volunteer application."""
@@ -53,7 +53,7 @@ def log_volunteer_hours(
 
 @router.get("/my-certificates", response_model=List[schemas.CertificateResponse])
 def get_my_certificates(
-    current_user: models.Volunteer = Depends(get_current_user),
+    current_user: models.Volunteer = Depends(get_current_ngo),
     db: Session = Depends(get_db)
 ):
     """Allows a volunteer to view all their verified service certificates and hours."""

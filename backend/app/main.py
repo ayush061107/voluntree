@@ -7,11 +7,10 @@ from app.api import auth, volunteer, certificates, opportunities, applications, 
 Base.metadata.create_all(bind=engine)
 app = FastAPI(title=settings.PROJECT_NAME)
 
-# Setting allow_credentials=False allows us to use global wildcard origins seamlessly
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

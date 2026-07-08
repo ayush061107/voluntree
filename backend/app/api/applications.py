@@ -4,7 +4,7 @@ from typing import List
 from app.core.database import get_db
 from app.models import models
 from app.schemas import application as schemas
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, get_current_ngo
 
 router = APIRouter()
 
@@ -46,28 +46,22 @@ def get_volunteer_applications(volunteer_id: int, db: Session = Depends(get_db))
 
 @router.get("/ngo/my-applications", response_model=List[schemas.ApplicationResponse])
 def get_ngo_applications(
-    current_user: models.NGO = Depends(get_current_user),
+    current_user: models.NGO = Depends(get_current_ngo),
     db: Session = Depends(get_db)
 ):
     """Retrieves all incoming applications for opportunities managed by the logged-in NGO."""
-    if not hasattr(current_user, "org_name"):
-        raise HTTPException(status_code=403, detail="Only NGOs can access this dashboard")
-
     return db.query(models.Application).join(models.Opportunity).filter(
         models.Opportunity.ngo_id == current_user.id
     ).all()
 
-@router.patch("/{application_id}/status", response_model=schemas.ApplicationResponse)
+@router.put("/{application_id}/status", response_model=schemas.ApplicationResponse)
 def update_application_status(
     application_id: int,
     status_update: schemas.ApplicationUpdateStatus,
-    current_user: models.NGO = Depends(get_current_user),
+    current_user: models.NGO = Depends(get_current_ngo),
     db: Session = Depends(get_db)
 ):
     """Allows an NGO to Accept or Reject a specific volunteer application."""
-    if not hasattr(current_user, "org_name"):
-        raise HTTPException(status_code=403, detail="Only NGOs can modify application statuses")
-
     # Fetch application along with checking ownership via an explicit join condition
     application_data = db.query(models.Application, models.Opportunity.ngo_id)\
         .join(models.Opportunity, models.Application.opportunity_id == models.Opportunity.id)\
@@ -83,8 +77,8 @@ def update_application_status(
         raise HTTPException(status_code=403, detail="You do not have permission to modify this application")
 
     normalized_status = status_update.status.capitalize()
-    if normalized_status not in ['Pending', 'Accepted', 'Rejected', 'Completed']:
-        raise HTTPException(status_code=400, detail="Invalid status value. Use 'Accepted' or 'Rejected'")
+    if normalized_status not in ['Pending', 'Accepted', 'Approved', 'Rejected', 'Completed']:
+        raise HTTPException(status_code=400, detail="Invalid status value.")
 
     application.status = normalized_status
     db.commit()

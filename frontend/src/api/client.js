@@ -1,8 +1,7 @@
 import axios from 'axios';
 
-// Dynamically uses an environment variable fallback for production/deployment ease
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://solid-space-funicular-4jvr5rw697x42jj57-8000.app.github.dev/api/v1',
+  baseURL: '/api/v1',
   headers: {
     'Content-Type': 'application/json'
   }
