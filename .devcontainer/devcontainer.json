@@ -1,0 +1,15 @@
+{
+    "name": "VolunTree Development Environment",
+    "portsAttributes": {
+        "5173": {
+            "label": "Frontend (Vite)",
+            "onAutoForward": "openBrowser",
+            "visibility": "public"
+        },
+        "8000": {
+            "label": "Backend API (FastAPI)",
+            "onAutoForward": "silent",
+            "visibility": "public"
+        }
+    }
+}
