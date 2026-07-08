@@ -90,10 +90,14 @@ voluntree/
     │   └── main.jsx            # DOM registration mount node
     ├── package.json            # Node framework module configuration file
     └── vite.config.js          # Client builder specifications mapping local proxy loops
+
+
 ⚡ Step-By-Step Installation & Run Manual
+
 Follow these sequential steps exactly to configure and boot up your local instance of VolunTree without environment friction.
 
 📡 1. Configure and Run the Backend Environment
+
 Open your system shell, enter the backend working space, establish an isolated virtual context, and install the verified application library bundle:
 
 Bash
@@ -147,6 +151,7 @@ Log the Service Metrics: On that same accepted line item, click the blue Log Hou
 Inspect the Minted Micro-Credential Badge: Log back in as Volunteer B. Go to the newly available My Certificates console panel. Click the action button on your new row card. A beautiful modal certificate canvas renders live, displaying the verified 12 hours metric along with a secure, system-generated cryptographic hash receipt.
 
 🛠️ Common Troubleshooting Run-book
+
 Problem: App crashes on password login.
 
 Resolution: Ensure passlib has bcrypt dependencies explicitly initialized. Run pip install passlib bcrypt and make sure your server environment is reloaded.
