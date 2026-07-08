@@ -1,20 +1,19 @@
-# Python artifacts
+# Local Application Event Logs
+*.log
+backend.log
+uvicorn.log
+
+# Database Engine Instances
+*.db
+*.sqlite3
+
+# Virtual Execution Containers
+venv/
+.venv/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.venv/
-env/
-venv/
-.env
 
-# Database
-*.db
-backend/voluntree.db
-
-# Node / Frontend artifacts
+# Local Node Infrastructure
 node_modules/
-frontend/node_modules/
 dist/
-frontend/dist/
-.DS_Store
+.env
