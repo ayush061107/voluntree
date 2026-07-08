@@ -3,16 +3,14 @@ sys.path.append("/workspaces/voluntree/backend")
 
 from app.core.database import SessionLocal, engine
 from app.models.models import Base, NGO, Volunteer, Opportunity, Application
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+from app.core.security import get_password_hash
 
 # Build fresh tables cleanly
 Base.metadata.create_all(bind=engine)
 db = SessionLocal()
 
 try:
-    hashed_pwd = pwd_context.hash("hackathon2026")
+    hashed_pwd = get_password_hash("hackathon2026")
     
     # Ingest the real administrative NGO
     ngo = NGO(org_name="Habitat for Humanity", email="demo_admin@habitat.org", hashed_password=hashed_pwd, location="Remote")
